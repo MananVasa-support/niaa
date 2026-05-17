@@ -8,7 +8,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="niaaauth-config.js"></script>
 <script src="niaaauth.js"></script>
-<script>window.Auth.guardPage({redirectTo:"niaalogin.html"});</script>
+<script>window.Auth.guardPage({redirectTo:"index.html"});</script>
 <!-- END AUTH GUARD -->
 
 <meta charset="UTF-8"/>
@@ -304,9 +304,6 @@ html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--black);c
 <!-- ── TOAST ── -->
 <div class="toast" id="toast"></div>
 
-<!-- Firebase Firestore -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
 <script>
 // ══════════════════════════════════════════════════
 // FIRESTORE — cards collection
@@ -408,7 +405,7 @@ function closeMenu() {
 // ── Sign out ──
 async function doSignOut() {
   await window.Auth.signOut();
-  window.location.replace("niaalogin.html");
+  window.location.replace("index.html");
 }
 
 // ── Close menu on overlay click ──
