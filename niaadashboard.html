@@ -313,13 +313,27 @@ var CARDS_COL = "niaa_cards";
 
 window.addEventListener("load", function() {
   try {
-    // firebase already initialized by auth.js
     db = firebase.firestore();
     loadCards();
   } catch(e) {
-    showToast("Could not connect to database.", true);
+    // retry once after 2 seconds
+    setTimeout(function() {
+      try {
+        db = firebase.firestore();
+        loadCards();
+      } catch(e2) {
+        showToast("Could not connect to database.", true);
+      }
+    }, 2000);
   }
 });
+
+function ensureDb() {
+  if (!db) {
+    try { db = firebase.firestore(); } catch(e) {}
+  }
+  return db;
+}
 
 // ── Load cards from Firestore ──
 function loadCards() {
@@ -494,6 +508,7 @@ function saveCard() {
   var code = document.getElementById("modal-code").value.trim();
 
   if (!name) { showToast("Please enter a card name.", true); return; }
+  db = ensureDb(); if (!db) { showToast("Database not ready. Please refresh and try again.", true); return; }
 
   var payload = {};
 
@@ -502,7 +517,7 @@ function saveCard() {
     payload = {name: name, html: code, createdAt: firebase.firestore.FieldValue.serverTimestamp()};
     db.collection(CARDS_COL).add(payload)
       .then(function() { showToast("Card added!"); closeCardModal(); loadCards(); })
-      .catch(function() { showToast("Could not save card.", true); });
+      .catch(function(e) { showToast("Could not save: " + e.message, true); });
   } else if (_editMode === "rename") {
     db.collection(CARDS_COL).doc(_editId).update({name: name})
       .then(function() { showToast("Card renamed!"); closeCardModal(); loadCards(); })
@@ -511,7 +526,7 @@ function saveCard() {
     if (!code) { showToast("Please paste the HTML code.", true); return; }
     db.collection(CARDS_COL).doc(_editId).update({name: name, html: code})
       .then(function() { showToast("Card updated!"); closeCardModal(); loadCards(); })
-      .catch(function() { showToast("Could not update card.", true); });
+      .catch(function(e) { showToast("Could not update: " + e.message, true); });
   }
 }
 
