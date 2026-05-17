@@ -603,11 +603,7 @@ function showSection() {
 /* ── Load dynamic dropdowns from sheet ── */
 function loadDynamic() {
   try {
-    fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({action: "getDynamicData"})
-      })
+    fetch(APPS_SCRIPT_URL + "?action=getDynamicData")
       .then(function(r){return r.json();})
       .then(function(d) {
         if (!d) return;
@@ -868,9 +864,9 @@ function doSubmit() {
   } else { doSend(data); }
 }
 function doSend(data) {
-  fetch(APPS_SCRIPT_URL, {
+  fetch(APPS_SCRIPT_URL + "?action=submitFormData", {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
+      headers: {"Content-Type": "text/plain"},
       body: JSON.stringify({action: "submitFormData", data: data})
     })
     .then(function(r){return r.json();})
@@ -907,11 +903,7 @@ function saveNavBtn() {
   addNavButton(nm, lk);
   closeNavModal();
   try {
-    fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({action: "saveNavButton", name: nm, link: lk})
-      })
+    fetch(APPS_SCRIPT_URL + "?action=saveNavButton&name=" + encodeURIComponent(nm) + "&link=" + encodeURIComponent(lk))
       .then(function(){ showToast("Button saved!", false); })
       .catch(function(e){ showToast("Save failed.", true); });
   } catch(x) {
@@ -947,11 +939,7 @@ function getCmCoVal() {
 window.onload = function() {
   fillStateDropdown(SC);
   try {
-    fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({action: "getNavButtons"})
-      })
+    fetch(APPS_SCRIPT_URL + "?action=getNavButtons")
       .then(function(r){return r.json();})
       .then(function(btns) {
         if (!btns || !btns.length) return;
