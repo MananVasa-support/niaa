@@ -445,13 +445,19 @@ function showDropdown(e, id, data) {
 }
 function closeDropdown() {
   document.getElementById("dropdown").style.display = "none";
-  _dropId = null; _dropData = null;
+  // NOTE: do NOT clear _dropId/_dropData here - they're needed by drop actions
 }
-document.addEventListener("click", function() { closeDropdown(); });
+document.addEventListener("click", function(e) {
+  var dd = document.getElementById("dropdown");
+  if (dd && !dd.contains(e.target)) {
+    dd.style.display = "none";
+  }
+});
 
 function dropRename() {
+  var id = _dropId; var data = _dropData;
   closeDropdown();
-  openCardModal(_dropId, _dropData, "rename");
+  openCardModal(id, data, "rename");
 }
 function dropEdit() {
   var id = _dropId;
@@ -503,6 +509,7 @@ function openCardModal(id, data, mode) {
 function closeCardModal() {
   document.getElementById("card-modal").className = "modal-overlay";
   _editId = null; _editMode = null;
+  _dropId = null; _dropData = null;
 }
 
 function saveCard() {
