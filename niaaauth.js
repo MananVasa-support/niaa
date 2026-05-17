@@ -26,7 +26,7 @@
   async function signOut() { await auth.signOut(); }
 
   function guardPage(options) {
-    var redirectTo = (options && options.redirectTo) || "niaalogin.html";
+    var redirectTo = (options && options.redirectTo) || "index.html";
     auth.onAuthStateChanged(function (user) {
       if (!user) {
         window.location.replace(redirectTo);
