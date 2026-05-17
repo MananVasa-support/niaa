@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sign in · Niaa Jewels Ecosystem</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --teal:#00b0a3;--teal-dark:#007f76;--teal-bright:#00cfc0;
+    --black:#0a0a0a;--black-deep:#050505;--black-warm:#0e0c0a;--black-warm2:#160e0e;
+    --cream:#fafafa;--white:#ffffff;
+    --text-dark:#111;--text-mid:#333;--text-muted:#777;--text-light:#aaa;
+    --border:rgba(0,0,0,0.1);
+  }
+  html{background:var(--cream);}
+  body{font-family:Arial,sans-serif;color:var(--text-dark);-webkit-tap-highlight-color:transparent;min-height:100vh;}
+
+  .login-page{
+    display:grid;grid-template-columns:1.15fr 1fr;
+    min-height:100vh;background:var(--cream);
+  }
+
+  .lp-left{
+    position:relative;overflow:hidden;
+    background:linear-gradient(135deg,var(--black-deep) 0%,var(--black-warm) 50%,var(--black-warm2) 100%);
+    padding:72px 80px;
+    display:flex;flex-direction:column;justify-content:space-between;
+    color:#fff;
+    animation:fadeIn .35s ease-out both;
+  }
+  .lp-left::before{
+    content:'';position:absolute;top:-140px;right:-140px;
+    width:440px;height:440px;border-radius:50%;
+    background:radial-gradient(circle,rgba(0,176,163,0.28) 0%,transparent 65%);
+    pointer-events:none;
+  }
+  .lp-left::after{
+    content:'';position:absolute;bottom:-110px;left:-90px;
+    width:340px;height:340px;border-radius:50%;
+    background:radial-gradient(circle,rgba(0,176,163,0.14) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  .lp-grain{
+    position:absolute;inset:0;opacity:.05;pointer-events:none;
+    background-image:radial-gradient(rgba(255,255,255,.6) 1px,transparent 1px);
+    background-size:4px 4px;
+  }
+
+  .lp-top{position:relative;z-index:2;display:flex;align-items:center;gap:22px;}
+  .lp-logo-card{
+    background:#fff;border-radius:50%;
+    padding:8px;
+    box-shadow:0 14px 38px rgba(0,0,0,.4);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .lp-logo-card img{display:block;height:64px;width:64px;border-radius:50%;object-fit:cover;}
+  .lp-brand{font-size:14px;letter-spacing:.34em;font-weight:700;line-height:1.2;color:rgba(255,255,255,.6);}
+
+  .lp-middle{position:relative;z-index:2;}
+  .lp-eyebrow{font-size:20px;font-weight:800;letter-spacing:.12em;color:var(--teal);margin-bottom:24px;}
+  .lp-headline{font-size:clamp(2rem,5.5vw,56px);font-weight:800;line-height:1.1;letter-spacing:-.02em;color:#fff;}
+  .lp-headline .accent{color:var(--teal);}
+  .lp-sub{margin-top:26px;color:rgba(255,255,255,.72);font-size:17px;line-height:1.65;max-width:460px;}
+
+  .lp-bottom{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;}
+  .lp-meta{font-size:13px;color:rgba(255,255,255,.45);letter-spacing:.04em;}
+  .lp-meta a{color:rgba(255,255,255,.75);text-decoration:none;}
+  .lp-meta a:hover{color:#fff;}
+  .lp-indicator{display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,.55);}
+  .lp-indicator .pulse{
+    width:9px;height:9px;border-radius:50%;background:#28c840;
+    box-shadow:0 0 0 0 rgba(40,200,64,.6);animation:pulse 2s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(40,200,64,.6);}
+    70%{box-shadow:0 0 0 8px rgba(40,200,64,0);}
+    100%{box-shadow:0 0 0 0 rgba(40,200,64,0);}
+  }
+
+  .lp-right{
+    position:relative;overflow:hidden;
+    background:
+      radial-gradient(circle at 85% 12%,rgba(0,176,163,0.05) 0%,transparent 55%),
+      radial-gradient(circle at 10% 95%,rgba(0,0,0,0.04) 0%,transparent 55%),
+      linear-gradient(155deg,#faf6f1 0%,#f3ece4 55%,#ece3d8 100%);
+    padding:72px 80px;
+    display:flex;flex-direction:column;justify-content:center;
+    color:var(--text-dark);
+    animation:slideInRight .35s ease-out both;
+  }
+  .lp-right .form-wrap{position:relative;z-index:1;}
+  .form-wrap{width:100%;max-width:480px;margin:0 auto;}
+  .form-eyebrow{font-size:12px;font-weight:700;letter-spacing:.32em;color:var(--teal);text-transform:uppercase;margin-bottom:14px;}
+  .form-title{font-size:40px;font-weight:700;letter-spacing:-.015em;margin-bottom:10px;}
+  .form-subtitle{font-size:17px;color:var(--text-muted);margin-bottom:36px;}
+
+  .form-field{margin-bottom:22px;}
+  .form-label{display:block;font-size:13px;font-weight:700;color:var(--text-mid);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;}
+  .form-input{
+    width:100%;background:#fff;color:var(--text-dark);
+    border:1.5px solid var(--border);border-radius:10px;
+    padding:17px 18px;font-size:16px;font-family:Arial,sans-serif;
+    outline:none;transition:border-color .2s,box-shadow .2s;
+  }
+  .form-input::placeholder{color:var(--text-light);}
+  .form-input:focus{border-color:var(--teal);box-shadow:0 0 0 4px rgba(0,176,163,.08);}
+  .form-input.invalid{border-color:var(--teal);animation:shake .24s linear;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-4px);}
+    50%{transform:translateX(4px);}
+    75%{transform:translateX(-4px);}
+  }
+
+  .form-row{display:flex;align-items:center;justify-content:space-between;margin:10px 0 26px;flex-wrap:wrap;gap:8px;}
+  .form-check{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--text-mid);cursor:pointer;}
+  .form-check input{accent-color:var(--teal);width:17px;height:17px;cursor:pointer;}
+  .form-row a{font-size:15px;color:var(--teal);text-decoration:none;font-weight:600;}
+  .form-row a:hover{text-decoration:underline;}
+
+  .show-pwd-row{margin-bottom:6px;}
+
+  .form-error{
+    font-size:14.5px;color:var(--teal-dark);font-weight:600;
+    background:rgba(0,176,163,0.06);border:1px solid rgba(0,176,163,0.18);
+    border-radius:10px;padding:12px 14px;margin-bottom:18px;
+  }
+
+  .form-btn{
+    width:100%;background:var(--black);color:#fff;
+    padding:19px 0;border:none;border-radius:10px;
+    font-size:14.5px;font-weight:700;letter-spacing:.14em;
+    text-transform:uppercase;cursor:pointer;
+    position:relative;overflow:hidden;
+    box-shadow:0 12px 28px rgba(0,0,0,.25),inset 0 0 0 1px rgba(0,176,163,.4);
+    transition:transform .12s ease-out,box-shadow .2s;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .form-btn::before{
+    content:'';position:absolute;top:0;left:-100%;
+    width:100%;height:100%;
+    background:linear-gradient(90deg,transparent,rgba(0,176,163,.4),transparent);
+    transition:left .6s ease;
+  }
+  .form-btn:hover::before{left:100%;}
+  .form-btn:active{transform:translateY(1px);}
+  .form-btn:disabled{opacity:.7;cursor:not-allowed;}
+  .form-btn:disabled::before{left:-100%;transition:none;}
+  .btn-spinner{
+    display:none;width:16px;height:16px;margin-left:10px;
+    border:2px solid rgba(255,255,255,.3);border-top-color:#fff;
+    border-radius:50%;animation:spin .7s linear infinite;
+  }
+  .form-btn.loading .btn-label{opacity:.8;}
+  .form-btn.loading .btn-spinner{display:inline-block;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .form-footer{margin-top:30px;font-size:14px;color:var(--text-muted);text-align:center;line-height:1.6;}
+  .form-footer strong{color:var(--text-mid);}
+
+  .forgot-panel{margin-top:6px;animation:slideDown .3s ease-out both;text-align:center;}
+  .forgot-icon{
+    width:92px;height:92px;margin:0 auto 22px;border-radius:50%;
+    background:radial-gradient(circle at 50% 40%,rgba(0,176,163,0.14),rgba(0,176,163,0.04) 65%,transparent 75%);
+    display:flex;align-items:center;justify-content:center;
+    animation:lockPulse 2.4s ease-in-out infinite;
+  }
+  .forgot-icon svg{width:44px;height:44px;stroke:var(--teal);}
+  .forgot-icon svg .shackle{animation:shackleWiggle 2.4s ease-in-out infinite;transform-origin:32px 22px;}
+  @keyframes lockPulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(0,176,163,0.25);transform:scale(1);}
+    50%{box-shadow:0 0 0 18px rgba(0,176,163,0);transform:scale(1.04);}
+  }
+  @keyframes shackleWiggle{
+    0%,90%,100%{transform:rotate(0);}
+    45%{transform:rotate(-8deg);}
+    60%{transform:rotate(6deg);}
+    75%{transform:rotate(0);}
+  }
+  .forgot-title{font-size:28px;font-weight:700;margin-bottom:10px;letter-spacing:-.01em;}
+  .forgot-sub{font-size:16px;color:var(--text-muted);margin-bottom:26px;line-height:1.6;}
+  .forgot-card{
+    text-align:left;background:#fff;border:1px solid var(--border);border-radius:12px;
+    padding:18px 20px;margin-bottom:22px;
+    display:flex;align-items:flex-start;gap:14px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.04);
+  }
+  .forgot-card-icon{
+    flex:0 0 36px;width:36px;height:36px;border-radius:9px;
+    background:rgba(0,176,163,0.08);color:var(--teal);
+    display:flex;align-items:center;justify-content:center;font-size:18px;
+  }
+  .forgot-card-body{flex:1;}
+  .forgot-card-label{font-size:11px;font-weight:700;letter-spacing:.18em;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;}
+  .forgot-card-value{font-size:15.5px;font-weight:600;color:var(--text-dark);word-break:break-all;}
+  .forgot-card-value a{color:var(--text-dark);text-decoration:none;border-bottom:1px dashed rgba(0,0,0,0.2);}
+  .forgot-card-value a:hover{border-bottom-color:var(--teal);color:var(--teal);}
+
+  @keyframes slideDown{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  @keyframes slideInRight{from{opacity:0;transform:translateX(8px);}to{opacity:1;transform:translateX(0);}}
+
+  @media(max-width:899px){
+    .login-page{grid-template-columns:1fr;min-height:auto;}
+    .lp-left{padding:36px 28px;min-height:auto;}
+    .lp-left::before{width:280px;height:280px;top:-80px;right:-80px;}
+    .lp-left::after{width:200px;height:200px;bottom:-60px;left:-50px;}
+    .lp-headline{font-size:clamp(1.6rem,6vw,2.8rem);}
+    .lp-sub{font-size:14px;}
+    .lp-bottom{margin-top:28px;}
+    .lp-right{padding:36px 24px 48px;}
+    .form-title{font-size:24px;}
+  }
+  @media(max-width:480px){
+    .lp-left{padding:28px 20px;}
+    .lp-headline{font-size:clamp(1.4rem,7vw,2.2rem);}
+    .form-wrap{max-width:100%;}
+    .lp-bottom{flex-direction:column;align-items:flex-start;gap:10px;}
+  }
+
+  .show-forgot #signin-form{display:none;}
+  .show-forgot .form-eyebrow,.show-forgot .form-title,.show-forgot .form-subtitle{display:none;}
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="niaaauth-config.js"></script>
+<script src="niaaauth.js"></script>
+</head>
+<body>
+
+<noscript>
+  <div style="padding:24px;background:#0a0a0a;color:#fff;text-align:center;font-family:Arial,sans-serif;">
+    This page requires JavaScript. Please enable it to sign in.
+  </div>
+</noscript>
+
+<div class="login-page">
+
+  <aside class="lp-left" aria-hidden="true">
+    <div class="lp-grain"></div>
+    <div class="lp-top">
+      <div class="lp-logo-card">
+        <img src="data:image/jpeg;base64,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" alt="Niaa Jewels"/>
+      </div>
+      <div class="lp-brand">NIAA JEWELS</div>
+    </div>
+    <div class="lp-middle">
+      <div class="lp-eyebrow">Dare To Dazzle Differently</div>
+      <h1 class="lp-headline">A private workspace.<br/><span class="accent">Members only.</span></h1>
+      <p class="lp-sub">The Niaa Jewels Ecosystem is a confidential workspace for the internal team. Access is granted by invitation only.</p>
+    </div>
+    <div class="lp-bottom">
+      <div class="lp-meta">&copy; 2026 Niaa Jewels &middot; <a href="#">Privacy</a></div>
+      <div class="lp-indicator"><span class="pulse"></span> Secure connection</div>
+    </div>
+  </aside>
+
+  <main class="lp-right">
+    <div class="form-wrap">
+      <div class="form-eyebrow"></div>
+      <h2 class="form-title">Welcome back</h2>
+      <p class="form-subtitle">Enter your credentials to continue.</p>
+
+      <form id="signin-form" novalidate>
+        <div class="form-field">
+          <label class="form-label" for="email">Email address</label>
+          <input class="form-input" id="email" name="email" type="email" autocomplete="email" required placeholder="you@niaajewels.com"/>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="password">Password</label>
+          <input class="form-input" id="password" name="password" type="password" autocomplete="current-password" required placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"/>
+        </div>
+
+        <div class="form-row show-pwd-row">
+          <label class="form-check">
+            <input id="show-pwd" type="checkbox" onchange="document.getElementById('password').type=this.checked?'text':'password'"/>
+            <span>Show password</span>
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label class="form-check">
+            <input id="keep" type="checkbox" checked/>
+            <span>Keep me signed in</span>
+          </label>
+          <a href="#" id="forgot-link">Forgot password?</a>
+        </div>
+
+        <div id="error" class="form-error" role="alert" aria-live="polite" hidden></div>
+
+        <button class="form-btn" id="submit-btn" type="submit">
+          <span class="btn-label">Continue to Ecosystem</span>
+          <span class="btn-spinner" aria-hidden="true"></span>
+        </button>
+
+        <p class="form-footer">
+          Need access? Contact <strong>your administrator</strong>.<br/>
+          This is a private system. Unauthorized access is prohibited.
+        </p>
+      </form>
+
+      <div id="forgot-panel" class="forgot-panel" hidden>
+        <div class="forgot-icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+            <path class="shackle" d="M20 30 V22 a12 12 0 0 1 24 0 V30"/>
+            <rect x="14" y="30" width="36" height="26" rx="4"/>
+            <circle cx="32" cy="42" r="2.5" fill="currentColor" stroke="none"/>
+            <path d="M32 44.5 V49"/>
+          </svg>
+        </div>
+        <h3 class="forgot-title">Access is invitation-only</h3>
+        <p class="forgot-sub">For your security, passwords cannot be reset from this page. Please reach out to your administrator to recover access.</p>
+        <div class="forgot-card">
+          <div class="forgot-card-icon" aria-hidden="true">&#9993;</div>
+          <div class="forgot-card-body">
+            <div class="forgot-card-label">Contact administrator</div>
+            <!-- REPLACE WITH YOUR ADMIN EMAIL BELOW -->
+            <div class="forgot-card-value"><a href="mailto:admin@niaajewels.com?subject=Niaa%20Ecosystem%20access%20%E2%80%94%20password%20help">admin@niaajewels.com</a></div>
+          </div>
+        </div>
+        <button class="form-btn" id="forgot-back" type="button">
+          <span class="btn-label">Back to sign in</span>
+        </button>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+  var form      = document.getElementById('signin-form');
+  var email     = document.getElementById('email');
+  var password  = document.getElementById('password');
+  var keep      = document.getElementById('keep');
+  var errorBox  = document.getElementById('error');
+  var submitBtn = document.getElementById('submit-btn');
+
+  function showError(msg){errorBox.textContent=msg;errorBox.hidden=false;email.classList.remove('invalid');password.classList.remove('invalid');void password.offsetWidth;password.classList.add('invalid');}
+  function clearError(){errorBox.hidden=true;errorBox.textContent='';email.classList.remove('invalid');password.classList.remove('invalid');}
+  function setLoading(on){submitBtn.disabled=on;submitBtn.classList.toggle('loading',on);}
+
+  form.addEventListener('submit',async function(e){
+    e.preventDefault();clearError();
+    var emailVal=email.value.trim();var pwVal=password.value;
+    if(!emailVal||!pwVal){showError('Please enter both email and password.');return;}
+    setLoading(true);
+    try{
+      await window.Auth.signIn(emailVal,pwVal,keep.checked);
+      window.location.replace('niaadashboard.html');
+    }catch(err){setLoading(false);showError(window.Auth.friendlyError(err));}
+  });
+
+  [email,password].forEach(function(el){el.addEventListener('input',function(){if(!errorBox.hidden)clearError();});});
+
+  var forgotLink  = document.getElementById('forgot-link');
+  var forgotPanel = document.getElementById('forgot-panel');
+  var forgotBack  = document.getElementById('forgot-back');
+  var formWrap    = document.querySelector('.form-wrap');
+
+  forgotLink.addEventListener('click',function(e){e.preventDefault();forgotPanel.hidden=false;formWrap.classList.add('show-forgot');});
+  forgotBack.addEventListener('click',function(){forgotPanel.hidden=true;formWrap.classList.remove('show-forgot');});
+})();
+</script>
+
+<script>window.Auth.redirectIfSignedIn('niaadashboard.html');</script>
+</body>
+</html>

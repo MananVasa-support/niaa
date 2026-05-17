@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- AUTH GUARD -->
+<style id="auth-guard-hide">html{visibility:hidden;}</style>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="niaaauth-config.js"></script>
+<script src="niaaauth.js"></script>
+<script>window.Auth.guardPage({redirectTo:"niaalogin.html"});</script>
+<!-- END AUTH GUARD -->
+
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Niaa Jewels Ecosystem</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --teal:#00b0a3;--teal-dark:#007f76;
+  --black:#0a0a0a;--off-black:#111;--surface:#161616;--surface2:#1e1e1e;
+  --white:#fff;--text-muted:rgba(255,255,255,.45);--border:rgba(255,255,255,.08);
+  --red:#e53935;
+}
+html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--black);color:var(--white);overflow:hidden;}
+
+/* ── TOP BAR ── */
+.topbar{
+  height:56px;background:var(--off-black);
+  border-bottom:2px solid var(--teal);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;position:fixed;top:0;left:0;right:0;z-index:200;
+}
+.topbar-brand{display:flex;align-items:center;gap:10px;}
+.topbar-logo{width:34px;height:34px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(0,176,163,.4);}
+.topbar-name{font-family:"Bebas Neue",sans-serif;font-size:1.1rem;letter-spacing:4px;color:rgba(255,255,255,.7);}
+.topbar-name span{color:var(--teal);}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.tb-btn{
+  padding:7px 16px;border:none;border-radius:5px;
+  font-family:"DM Sans",sans-serif;font-size:.75rem;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;
+  transition:background .2s,transform .1s;
+}
+.tb-btn:active{transform:scale(.97);}
+.tb-menu{background:var(--teal);color:#fff;}
+.tb-menu:hover{background:var(--teal-dark);}
+.tb-signout{background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);}
+.tb-signout:hover{background:#2a2a2a;color:#fff;}
+
+/* ── IFRAME AREA ── */
+.iframe-wrap{
+  position:fixed;top:56px;left:0;right:0;bottom:0;
+  display:none;
+}
+.iframe-wrap.on{display:block;}
+.iframe-wrap iframe{width:100%;height:100%;border:none;}
+
+/* ── MENU OVERLAY ── */
+.menu-overlay{
+  display:none;position:fixed;inset:0;z-index:300;
+  background:rgba(0,0,0,.8);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:20px;
+  overflow-y:auto;
+}
+.menu-overlay.on{display:flex;}
+.menu-box{
+  background:var(--off-black);border:1px solid var(--border);
+  border-radius:16px;padding:32px;
+  width:100%;max-width:860px;
+  animation:popIn .22s ease-out both;
+  position:relative;
+}
+@keyframes popIn{from{opacity:0;transform:scale(.94);}to{opacity:1;transform:scale(1);}}
+
+.menu-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}
+.menu-title-block{}
+.menu-eyebrow{font-size:.68rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:4px;}
+.menu-title{font-family:"Bebas Neue",sans-serif;font-size:1.8rem;letter-spacing:2px;color:#fff;}
+.menu-close{
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text-muted);width:36px;height:36px;border-radius:8px;
+  font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:color .2s,background .2s;flex-shrink:0;
+}
+.menu-close:hover{background:#2a2a2a;color:#fff;}
+
+/* ── CARDS GRID ── */
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:14px;
+  min-height:80px;
+}
+.card{
+  background:var(--surface);border:1.5px solid var(--border);border-radius:12px;
+  padding:22px 18px 18px;cursor:pointer;position:relative;
+  transition:border-color .2s,transform .2s,box-shadow .2s;
+  display:flex;flex-direction:column;gap:8px;
+}
+.card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--teal);border-radius:12px 12px 0 0;
+  transform:scaleX(0);transition:transform .2s;
+}
+.card:hover{border-color:rgba(0,176,163,.5);transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,176,163,.12);}
+.card:hover::before{transform:scaleX(1);}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.card-name{font-size:.92rem;font-weight:700;color:#fff;line-height:1.3;flex:1;}
+.card-dots{
+  width:28px;height:28px;border-radius:6px;
+  background:transparent;border:none;color:var(--text-muted);
+  font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .2s,color .2s;flex-shrink:0;
+}
+.card-dots:hover{background:var(--surface2);color:#fff;}
+.card-arrow{font-size:.78rem;color:var(--teal);opacity:0;transition:opacity .2s;}
+.card:hover .card-arrow{opacity:1;}
+
+/* Add card */
+.card-add{
+  background:transparent;border:1.5px dashed rgba(0,176,163,.3);border-radius:12px;
+  padding:22px 18px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;transition:border-color .2s,background .2s;min-height:90px;
+}
+.card-add:hover{border-color:var(--teal);background:rgba(0,176,163,.04);}
+.card-add-icon{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(0,176,163,.12);color:var(--teal);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;font-weight:300;transition:background .2s;
+}
+.card-add:hover .card-add-icon{background:rgba(0,176,163,.2);}
+.card-add-label{font-size:.78rem;font-weight:600;color:var(--text-muted);letter-spacing:1px;}
+
+/* ── DROPDOWN MENU ── */
+.dropdown{
+  position:fixed;z-index:500;
+  background:#1e1e1e;border:1px solid var(--border);border-radius:10px;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+  overflow:hidden;min-width:160px;
+  animation:fadeIn .15s ease-out both;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
+.dropdown-item{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 16px;font-size:.84rem;font-weight:500;
+  cursor:pointer;transition:background .15s;color:#fff;
+  border:none;background:none;width:100%;text-align:left;
+  font-family:"DM Sans",sans-serif;
+}
+.dropdown-item:hover{background:#2a2a2a;}
+.dropdown-item.danger{color:var(--red);}
+.dropdown-item.danger:hover{background:rgba(229,57,53,.08);}
+.dropdown-divider{height:1px;background:var(--border);margin:4px 0;}
+
+/* ── MODAL (add/edit card) ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:400;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.on{display:flex;}
+.modal-box{
+  background:var(--off-black);border:1px solid var(--border);border-radius:14px;
+  padding:28px;width:100%;max-width:540px;
+  animation:popIn .2s ease-out both;
+}
+.modal-title{font-family:"Bebas Neue",sans-serif;font-size:1.4rem;letter-spacing:2px;margin-bottom:20px;color:#fff;}
+.modal-field{margin-bottom:16px;}
+.modal-label{display:block;font-size:.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:7px;}
+.modal-input,.modal-textarea{
+  width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;
+  padding:11px 14px;font-family:"DM Sans",sans-serif;font-size:.9rem;color:#fff;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.modal-input:focus,.modal-textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,176,163,.08);}
+.modal-input::placeholder,.modal-textarea::placeholder{color:rgba(255,255,255,.2);}
+.modal-textarea{resize:vertical;min-height:120px;font-size:.82rem;line-height:1.5;}
+.modal-note{font-size:.74rem;color:rgba(255,255,255,.25);margin-top:5px;line-height:1.5;}
+.modal-footer{display:flex;gap:10px;margin-top:20px;}
+.modal-btn{
+  flex:1;padding:12px;border:none;border-radius:8px;
+  font-family:"DM Sans",sans-serif;font-size:.82rem;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s;
+}
+.modal-btn-cancel{background:var(--surface2);color:var(--text-muted);}
+.modal-btn-cancel:hover{background:#2a2a2a;color:#fff;}
+.modal-btn-save{background:var(--teal);color:#fff;}
+.modal-btn-save:hover{background:var(--teal-dark);}
+
+/* ── EMPTY STATE ── */
+.empty-state{
+  grid-column:1/-1;
+  text-align:center;padding:40px 20px;
+}
+.empty-icon{font-size:2rem;margin-bottom:10px;opacity:.3;}
+.empty-text{font-size:.85rem;color:var(--text-muted);line-height:1.7;}
+
+/* ── LOADING ── */
+.loading-state{
+  grid-column:1/-1;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:32px;color:var(--text-muted);font-size:.85rem;
+}
+.loading-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--teal);
+  animation:blink .9s infinite;
+}
+.loading-dot:nth-child(2){animation-delay:.2s;}
+.loading-dot:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,100%{opacity:.2;}50%{opacity:1;}}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--off-black);border:1px solid var(--border);border-left:4px solid var(--teal);
+  color:#fff;padding:10px 22px;border-radius:8px;font-size:.84rem;
+  box-shadow:0 4px 20px rgba(0,0,0,.4);z-index:999;
+  opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap;
+}
+.toast.on{opacity:1;}
+.toast.err{border-left-color:var(--red);}
+
+@media(max-width:540px){
+  .topbar{padding:0 12px;}
+  .topbar-name{display:none;}
+  .tb-btn{padding:6px 10px;font-size:.68rem;letter-spacing:1px;}
+  .menu-box{padding:20px;}
+  .cards-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOP BAR ── -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <img class="topbar-logo" src="data:image/jpeg;base64,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" alt="Niaa Jewels">
+    <div class="topbar-name">NIAA <span>JEWELS</span></div>
+  </div>
+  <div class="topbar-right">
+    <button class="tb-btn tb-menu" onclick="openMenu()">&#9776; Menu</button>
+    <button class="tb-btn tb-signout" onclick="doSignOut()">Sign Out</button>
+  </div>
+</div>
+
+<!-- ── IFRAME CONTENT AREA ── -->
+<div class="iframe-wrap" id="iframe-wrap">
+  <iframe id="content-frame" src="" title="Content"></iframe>
+</div>
+
+<!-- ── MENU OVERLAY ── -->
+<div class="menu-overlay on" id="menu-overlay">
+  <div class="menu-box">
+    <div class="menu-header">
+      <div class="menu-title-block">
+        <div class="menu-eyebrow">Niaa Jewels Ecosystem</div>
+        <div class="menu-title">Where to?</div>
+      </div>
+      <button class="menu-close" id="menu-close-btn" onclick="closeMenu()" title="Close">&times;</button>
+    </div>
+    <div class="cards-grid" id="cards-grid">
+      <div class="loading-state">
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ADD / EDIT CARD MODAL ── -->
+<div class="modal-overlay" id="card-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title">Add New Card</div>
+    <div class="modal-field">
+      <label class="modal-label">Card Name</label>
+      <input class="modal-input" id="modal-name" type="text" placeholder="e.g. Niaa Ecosystem Form">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">HTML Code</label>
+      <textarea class="modal-textarea" id="modal-code" placeholder="Paste the full HTML code here..."></textarea>
+      <div class="modal-note">Paste the complete HTML file content. It will load inside the page when the card is opened.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn modal-btn-cancel" onclick="closeCardModal()">Cancel</button>
+      <button class="modal-btn modal-btn-save" onclick="saveCard()">Save Card</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DROPDOWN MENU ── -->
+<div class="dropdown" id="dropdown" style="display:none;">
+  <button class="dropdown-item" onclick="dropRename()">&#9998; &nbsp;Rename Card</button>
+  <button class="dropdown-item" onclick="dropEdit()">&#128196; &nbsp;Edit HTML Code</button>
+  <div class="dropdown-divider"></div>
+  <button class="dropdown-item danger" onclick="dropRemove()">&#128465; &nbsp;Remove Card</button>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<!-- Firebase Firestore -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+// ══════════════════════════════════════════════════
+// FIRESTORE — cards collection
+// ══════════════════════════════════════════════════
+var db;
+var CARDS_COL = "niaa_cards";
+
+window.addEventListener("load", function() {
+  try {
+    // firebase already initialized by auth.js
+    db = firebase.firestore();
+    loadCards();
+  } catch(e) {
+    showToast("Could not connect to database.", true);
+  }
+});
+
+// ── Load cards from Firestore ──
+function loadCards() {
+  var grid = document.getElementById("cards-grid");
+  grid.innerHTML = '<div class="loading-state"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>';
+
+  db.collection(CARDS_COL).orderBy("createdAt").get()
+    .then(function(snap) {
+      renderCards(snap);
+    })
+    .catch(function(e) {
+      grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Could not load cards.<br>Check your Firestore setup.</div></div>';
+    });
+}
+
+function renderCards(snap) {
+  var grid = document.getElementById("cards-grid");
+  grid.innerHTML = "";
+
+  if (snap.empty) {
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">🃏</div><div class="empty-text">No cards yet.<br>Click + to add your first card.</div></div>';
+  } else {
+    snap.forEach(function(doc) {
+      var data = doc.data();
+      var card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML =
+        "<div class=\"card-top\">" +
+          "<div class=\"card-name\">" + esc(data.name) + "</div>" +
+          "<button class=\"card-dots\" title=\"Options\">&#8942;</button>" +
+        "</div>" +
+        "<div class=\"card-arrow\">Open &#8594;</div>";
+
+      // Open card on click (not on dots)
+      card.addEventListener("click", function(e) {
+        if (e.target.classList.contains("card-dots")) return;
+        openCard(doc.id, data);
+      });
+
+      // 3-dot menu
+      card.querySelector(".card-dots").addEventListener("click", function(e) {
+        e.stopPropagation();
+        showDropdown(e, doc.id, data);
+      });
+
+      grid.appendChild(card);
+    });
+  }
+
+  // Always add the + button at the end
+  var addBtn = document.createElement("div");
+  addBtn.className = "card-add";
+  addBtn.innerHTML =
+    "<div class=\"card-add-icon\">+</div>" +
+    "<div class=\"card-add-label\">Add Card</div>";
+  addBtn.onclick = function() { openCardModal(); };
+  grid.appendChild(addBtn);
+}
+
+// ── Open card in iframe ──
+function openCard(id, data) {
+  closeMenu();
+  var wrap = document.getElementById("iframe-wrap");
+  var frame = document.getElementById("content-frame");
+
+  // Write HTML into iframe
+  var blob = new Blob([data.html], {type: "text/html"});
+  var url = URL.createObjectURL(blob);
+  frame.src = url;
+  wrap.className = "iframe-wrap on";
+}
+
+// ── Menu open/close ──
+function openMenu() {
+  loadCards();
+  document.getElementById("menu-overlay").className = "menu-overlay on";
+}
+function closeMenu() {
+  document.getElementById("menu-overlay").className = "menu-overlay";
+  closeDropdown();
+}
+
+// ── Sign out ──
+async function doSignOut() {
+  await window.Auth.signOut();
+  window.location.replace("niaalogin.html");
+}
+
+// ── Close menu on overlay click ──
+document.getElementById("menu-overlay").addEventListener("click", function(e) {
+  if (e.target === this) closeMenu();
+});
+
+// ── Dropdown ──
+var _dropId = null;
+var _dropData = null;
+
+function showDropdown(e, id, data) {
+  _dropId = id; _dropData = data;
+  var dd = document.getElementById("dropdown");
+  dd.style.display = "block";
+  var rect = e.target.getBoundingClientRect();
+  var ddW = 170;
+  var left = rect.right - ddW;
+  if (left < 8) left = 8;
+  dd.style.left = left + "px";
+  dd.style.top = (rect.bottom + 4) + "px";
+  e.stopPropagation();
+}
+function closeDropdown() {
+  document.getElementById("dropdown").style.display = "none";
+  _dropId = null; _dropData = null;
+}
+document.addEventListener("click", function() { closeDropdown(); });
+
+function dropRename() {
+  closeDropdown();
+  openCardModal(_dropId, _dropData, "rename");
+}
+function dropEdit() {
+  closeDropdown();
+  openCardModal(_dropId, _dropData, "edit");
+}
+function dropRemove() {
+  var id = _dropId; var name = _dropData ? _dropData.name : "this card";
+  closeDropdown();
+  if (!confirm("Remove \"" + name + "\"? This cannot be undone.")) return;
+  db.collection(CARDS_COL).doc(id).delete()
+    .then(function() { showToast("Card removed."); loadCards(); })
+    .catch(function() { showToast("Could not remove card.", true); });
+}
+
+// ── Add / Edit card modal ──
+var _editId = null;
+var _editMode = null; // "add" | "rename" | "edit"
+
+function openCardModal(id, data, mode) {
+  _editId = id || null;
+  _editMode = mode || "add";
+  var title = document.getElementById("modal-title");
+  var nameInp = document.getElementById("modal-name");
+  var codeInp = document.getElementById("modal-code");
+  var codeField = codeInp.closest(".modal-field");
+
+  if (_editMode === "add") {
+    title.textContent = "Add New Card";
+    nameInp.value = "";
+    codeInp.value = "";
+    codeField.style.display = "";
+  } else if (_editMode === "rename") {
+    title.textContent = "Rename Card";
+    nameInp.value = data ? data.name : "";
+    codeInp.value = "";
+    codeField.style.display = "none";
+  } else if (_editMode === "edit") {
+    title.textContent = "Edit HTML Code";
+    nameInp.value = data ? data.name : "";
+    codeInp.value = data ? data.html : "";
+    codeField.style.display = "";
+  }
+
+  document.getElementById("card-modal").className = "modal-overlay on";
+  setTimeout(function() { nameInp.focus(); }, 100);
+}
+function closeCardModal() {
+  document.getElementById("card-modal").className = "modal-overlay";
+  _editId = null; _editMode = null;
+}
+
+function saveCard() {
+  var name = document.getElementById("modal-name").value.trim();
+  var code = document.getElementById("modal-code").value.trim();
+
+  if (!name) { showToast("Please enter a card name.", true); return; }
+
+  var payload = {};
+
+  if (_editMode === "add") {
+    if (!code) { showToast("Please paste the HTML code.", true); return; }
+    payload = {name: name, html: code, createdAt: firebase.firestore.FieldValue.serverTimestamp()};
+    db.collection(CARDS_COL).add(payload)
+      .then(function() { showToast("Card added!"); closeCardModal(); loadCards(); })
+      .catch(function() { showToast("Could not save card.", true); });
+  } else if (_editMode === "rename") {
+    db.collection(CARDS_COL).doc(_editId).update({name: name})
+      .then(function() { showToast("Card renamed!"); closeCardModal(); loadCards(); })
+      .catch(function() { showToast("Could not rename card.", true); });
+  } else if (_editMode === "edit") {
+    if (!code) { showToast("Please paste the HTML code.", true); return; }
+    db.collection(CARDS_COL).doc(_editId).update({name: name, html: code})
+      .then(function() { showToast("Card updated!"); closeCardModal(); loadCards(); })
+      .catch(function() { showToast("Could not update card.", true); });
+  }
+}
+
+// ── Escape HTML ──
+function esc(str) {
+  return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ── Toast ──
+var _toastTimer;
+function showToast(msg, err) {
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast on" + (err ? " err" : "");
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function() { t.className = "toast"; }, 3000);
+}
+</script>
+</body>
+</html>
