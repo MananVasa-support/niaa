@@ -454,8 +454,10 @@ function dropRename() {
   openCardModal(_dropId, _dropData, "rename");
 }
 function dropEdit() {
+  var id = _dropId;
+  var data = _dropData;
   closeDropdown();
-  openCardModal(_dropId, _dropData, "edit");
+  openCardModal(id, data, "edit");
 }
 function dropRemove() {
   var id = _dropId; var name = _dropData ? _dropData.name : "this card";
@@ -471,7 +473,7 @@ var _editId = null;
 var _editMode = null; // "add" | "rename" | "edit"
 
 function openCardModal(id, data, mode) {
-  _editId = id || null;
+  _editId = id ? String(id) : null;
   _editMode = mode || "add";
   var title = document.getElementById("modal-title");
   var nameInp = document.getElementById("modal-name");
@@ -524,6 +526,7 @@ function saveCard() {
       .catch(function() { showToast("Could not rename card.", true); });
   } else if (_editMode === "edit") {
     if (!code) { showToast("Please paste the HTML code.", true); return; }
+    if (!_editId) { showToast("Card ID missing. Please close and try again.", true); return; }
     db.collection(CARDS_COL).doc(_editId).update({name: name, html: code})
       .then(function() { showToast("Card updated!"); closeCardModal(); loadCards(); })
       .catch(function(e) { showToast("Could not update: " + e.message, true); });
