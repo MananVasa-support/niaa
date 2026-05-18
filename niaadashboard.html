@@ -396,18 +396,34 @@ function renderCards(snap) {
 // ── Open card in iframe ──
 function openCard(id, data) {
   closeMenu();
-  var wrap = document.getElementById("iframe-wrap");
-  var frame = document.getElementById("content-frame");
-  var content = data.html || "";
+  var content = (data.html || "").trim();
 
-  // If content is a URL, load directly. Otherwise inject as HTML blob.
-  if (content.trim().indexOf("http") === 0) {
-    frame.src = content.trim();
+  // If it's a URL
+  if (content.indexOf("http") === 0) {
+    // Check if it's an external URL (not on our own Vercel domain)
+    var ownDomain = window.location.hostname;
+    var urlHost = "";
+    try { urlHost = new URL(content).hostname; } catch(e) {}
+
+    if (urlHost && urlHost !== ownDomain) {
+      // External URL (Google Sheets, etc.) — open in new tab
+      window.open(content, "_blank");
+      return;
+    } else {
+      // Own domain URL — load in iframe
+      var wrap = document.getElementById("iframe-wrap");
+      var frame = document.getElementById("content-frame");
+      frame.src = content;
+      wrap.className = "iframe-wrap on";
+    }
   } else {
+    // Raw HTML — inject as blob
+    var wrap = document.getElementById("iframe-wrap");
+    var frame = document.getElementById("content-frame");
     var blob = new Blob([content], {type: "text/html"});
     frame.src = URL.createObjectURL(blob);
+    wrap.className = "iframe-wrap on";
   }
-  wrap.className = "iframe-wrap on";
 }
 
 // ── Menu open/close ──
