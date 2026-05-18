@@ -282,9 +282,9 @@ html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--black);c
       <input class="modal-input" id="modal-name" type="text" placeholder="e.g. Niaa Ecosystem Form">
     </div>
     <div class="modal-field">
-      <label class="modal-label">HTML Code</label>
-      <textarea class="modal-textarea" id="modal-code" placeholder="Paste the full HTML code here..."></textarea>
-      <div class="modal-note">Paste the complete HTML file content. It will load inside the page when the card is opened.</div>
+      <label class="modal-label">HTML Code or URL</label>
+      <textarea class="modal-textarea" id="modal-code" placeholder="Paste full HTML code OR a URL (https://...)"></textarea>
+      <div class="modal-note">Paste a URL (e.g. https://niaa-beta.vercel.app/niaaform.html) for fast loading, or paste full HTML code.</div>
     </div>
     <div class="modal-footer">
       <button class="modal-btn modal-btn-cancel" onclick="closeCardModal()">Cancel</button>
@@ -398,11 +398,15 @@ function openCard(id, data) {
   closeMenu();
   var wrap = document.getElementById("iframe-wrap");
   var frame = document.getElementById("content-frame");
+  var content = data.html || "";
 
-  // Write HTML into iframe
-  var blob = new Blob([data.html], {type: "text/html"});
-  var url = URL.createObjectURL(blob);
-  frame.src = url;
+  // If content is a URL, load directly. Otherwise inject as HTML blob.
+  if (content.trim().indexOf("http") === 0) {
+    frame.src = content.trim();
+  } else {
+    var blob = new Blob([content], {type: "text/html"});
+    frame.src = URL.createObjectURL(blob);
+  }
   wrap.className = "iframe-wrap on";
 }
 
