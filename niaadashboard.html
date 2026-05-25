@@ -323,15 +323,17 @@ window.addEventListener("load", function() {
 
   try {
     db = firebase.firestore();
+    console.log("Firestore initialized OK");
     loadCards();
   } catch(e) {
-    // retry once after 2 seconds
+    console.error("Firestore init error:", e.message);
     setTimeout(function() {
       try {
         db = firebase.firestore();
         loadCards();
       } catch(e2) {
-        showToast("Could not connect to database.", true);
+        console.error("Firestore retry error:", e2.message);
+        showToast("Could not connect to database: " + e2.message, true);
       }
     }, 2000);
   }
@@ -354,7 +356,8 @@ function loadCards() {
       renderCards(snap);
     })
     .catch(function(e) {
-      grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Could not load cards.<br>Check your Firestore setup.</div></div>';
+      console.error("Firestore error:", e.code, e.message);
+      grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Error: ' + e.code + '<br>' + e.message + '</div></div>';
     });
 }
 
