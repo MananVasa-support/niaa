@@ -382,8 +382,9 @@ function renderCards(snap) {
         openCard(doc.id, data);
       });
 
-      // 3-dot menu
-      card.querySelector(".card-dots").addEventListener("click", function(e) {
+      // 3-dot menu (only exists for admin)
+      var dotsBtn = card.querySelector(".card-dots");
+      if (dotsBtn) dotsBtn.addEventListener("click", function(e) {
         e.stopPropagation();
         showDropdown(e, doc.id, data);
       });
